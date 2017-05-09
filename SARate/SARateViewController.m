@@ -27,6 +27,7 @@
 
 #import "SARateViewController.h"
 #import <QuartzCore/QuartzCore.h>
+#import <StoreKit/StoreKit.h>
 #import "iRate.h"
 
 @interface SARateViewController ()
@@ -217,7 +218,12 @@
 {
     [iRate sharedInstance].ratedThisVersion = YES;
     if (buttonIndex != alertView.cancelButtonIndex){
-        [[iRate sharedInstance] openRatingsPageInAppStore];
+        if ([[[UIDevice currentDevice] systemVersion] compare:@"10.3" options:NSNumericSearch] != NSOrderedAscending) {
+            [SKStoreReviewController requestReview];
+        }
+        else {
+            [[iRate sharedInstance] openRatingsPageInAppStore];
+        }
     }
     _isShowed = NO;
     [self.view removeFromSuperview];
