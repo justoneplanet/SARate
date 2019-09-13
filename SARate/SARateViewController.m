@@ -55,7 +55,12 @@
     float width = 260.0;
     float height = 190.0;
     UIView *alertView = [[UIView alloc] initWithFrame:CGRectMake((self.view.frame.size.width/2)-(width/2), (self.view.frame.size.height/2)-(height/2), width, height)];
-    alertView.backgroundColor = [UIColor colorWithRed:228.0/255.0 green:228.0/255.0 blue:228.0/255.0 alpha:1];
+    if (@available(iOS 13.0, *)) {
+      alertView.backgroundColor = UIColor.systemBackgroundColor;
+    }
+    else {
+      alertView.backgroundColor = [UIColor colorWithRed:228.0/255.0 green:228.0/255.0 blue:228.0/255.0 alpha:1];
+    }
     alertView.layer.masksToBounds = YES;
     alertView.layer.cornerRadius = 10.0;
     [self.view addSubview:alertView];
