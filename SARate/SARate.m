@@ -114,9 +114,6 @@
 
 
 -(NSString *)cancelButtonLabelText{
-    if (_cancelButtonLabelText == nil){
-        _cancelButtonLabelText = NSLocalizedString(@"Not Now", @"");
-    }
     return _cancelButtonLabelText;
 }
 

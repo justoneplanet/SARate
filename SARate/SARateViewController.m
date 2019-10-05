@@ -74,7 +74,7 @@
     [alertView addSubview:headerLabel];
     
     
-    UILabel *descriptionLabel = [[UILabel alloc] initWithFrame:CGRectMake(5, 30, width-10, 60)];
+    UILabel *descriptionLabel = [[UILabel alloc] initWithFrame:CGRectMake(10, 30, width - 20, 60)];
     descriptionLabel.numberOfLines = 2;
     descriptionLabel.backgroundColor = [UIColor clearColor];
     descriptionLabel.text = _descriptionLabelText;
@@ -137,37 +137,40 @@
     _star5.frame = CGRectMake(_star4.frame.origin.x+starWeight+separatorWidth, starY, starWeight, starHeight);
     [alertView addSubview:_star5];
     
-    
-    UIButton *rateButton;
-    if ([[[UIDevice currentDevice] systemVersion] floatValue] >= 7.0){
-        rateButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-    } else {
-        rateButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    UIColor *borderColor = [UIColor colorWithRed:181.0/255.0 green:181.0/255.0 blue:181.0/255.0 alpha:1];
+    CGRect backgroundFrame = CGRectMake(-1.0, height - 44.0, width + 3.0, 44.0);
+    CGRect frame = CGRectMake(-1.0, height - 44.0 + 0.5, width + 3.0, 44.0);
+    UIView *background = [[UIView alloc] initWithFrame:backgroundFrame];
+    [background setBackgroundColor:borderColor];
+    [alertView addSubview:background];
+    UIStackView *stackView = [[UIStackView alloc] initWithFrame:frame];
+    stackView.axis = UILayoutConstraintAxisHorizontal;
+    stackView.alignment = UIStackViewAlignmentFill;
+    stackView.distribution = UIStackViewDistributionFillEqually;
+    stackView.spacing = 0.5;
+    stackView.layer.borderWidth = 0.5;
+    stackView.layer.borderColor = borderColor.CGColor;
+    [alertView addSubview:stackView];
+
+    if ([_cancelButtonLabelText length] != 0) {
+        UIButton *cancelButton;
+        cancelButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+        [cancelButton setBackgroundColor:UIColor.whiteColor];
+        [cancelButton setTitle:_cancelButtonLabelText forState:UIControlStateNormal];
+        cancelButton.titleLabel.font = [UIFont systemFontOfSize:16];
+        cancelButton.titleLabel.textColor = [UIColor colorWithRed:26.0/255.0 green:134.0/255.0 blue:252.0/255.0 alpha:1];
+        [cancelButton addTarget:self action:@selector(hideRaiting) forControlEvents:UIControlEventTouchUpInside];
+        [stackView addArrangedSubview:cancelButton];
     }
-    rateButton.frame = CGRectMake(width-(width/2)+1, height-44+1, width/2, 44.0);
+
+    UIButton *rateButton;
+    rateButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+    [rateButton setBackgroundColor:UIColor.whiteColor];
     [rateButton setTitle:_rateButtonLabelText forState:UIControlStateNormal];
     rateButton.titleLabel.font = [UIFont boldSystemFontOfSize:16];
     rateButton.titleLabel.textColor = [UIColor colorWithRed:26.0/255.0 green:134.0/255.0 blue:252.0/255.0 alpha:1];
     [rateButton addTarget:self action:@selector(setRaiting) forControlEvents:UIControlEventTouchUpInside];
-    rateButton.layer.borderWidth = 1;
-    rateButton.layer.borderColor = [[UIColor colorWithRed:181.0/255.0 green:181.0/255.0 blue:181.0/255.0 alpha:1] CGColor];
-    [alertView addSubview:rateButton];
-    
-    
-    UIButton *cancelButton;
-    if ([[[UIDevice currentDevice] systemVersion] floatValue] >= 7.0){
-        cancelButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-    } else {
-        cancelButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    }
-    cancelButton.frame = CGRectMake(-1, height-44+1, width/2+3, 44.0);
-    [cancelButton setTitle:_cancelButtonLabelText forState:UIControlStateNormal];
-    cancelButton.titleLabel.font = [UIFont systemFontOfSize:16];
-    cancelButton.titleLabel.textColor = [UIColor colorWithRed:26.0/255.0 green:134.0/255.0 blue:252.0/255.0 alpha:1];
-    [cancelButton addTarget:self action:@selector(hideRaiting) forControlEvents:UIControlEventTouchUpInside];
-    cancelButton.layer.borderWidth = 1;
-    cancelButton.layer.borderColor = [[UIColor colorWithRed:181.0/255.0 green:181.0/255.0 blue:181.0/255.0 alpha:1] CGColor];
-    [alertView addSubview:cancelButton];
+    [stackView addArrangedSubview:rateButton];
     
     _isShowed = YES;
     
@@ -200,7 +203,14 @@
         UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:_setRaitingAlertTitle message:_setRaitingAlertMessage delegate:nil cancelButtonTitle:_okText otherButtonTitles:nil];
         [alertView show];
         return;
-    } else if (_mark >= _minAppStoreRaiting){
+    }
+    else if (_mark >= _minAppStoreRaiting){
+        if (@available(iOS 10.3, *)) {
+            [SKStoreReviewController.class requestReview];
+            [self hideRaiting];
+            return;
+        }
+        // Fallback on earlier versions
         UIAlertView *alert = [[UIAlertView alloc] initWithTitle:_appstoreRaitingAlertTitle
                                                         message:_appstoreRaitingAlertMessage
                                                        delegate:self
